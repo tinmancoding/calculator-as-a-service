@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: addition-service
+  labels:
+    app: calculator
+    service: addition
+spec:
+  selector:
+    app: calculator
+    service: addition
+  ports:
+  - port: 8082
+    targetPort: 8082
+  type: ClusterIP
