@@ -18,3 +18,8 @@ target/
 
 # Maven wrapper downloaded files
 .mvn/wrapper/maven-wrapper.jar
+node_modules/
+dist/
+
+# Go binaries
+services/multiplication-service/multiplication-service
