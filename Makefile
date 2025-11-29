@@ -1,6 +1,6 @@
 # Calculator as a Service - Makefile
 # Docker image configuration
-DOCKER_REGISTRY ?= calculator
+DOCKER_REGISTRY ?= tinmancoding
 TAG ?= latest
 
 # Service directories
@@ -13,12 +13,12 @@ MULTIPLICATION_DIR := $(SERVICES_DIR)/multiplication-service
 DIVISION_DIR := $(SERVICES_DIR)/division-service
 
 # Docker image names
-GATEWAY_IMAGE := $(DOCKER_REGISTRY)/gateway-service:$(TAG)
-PARSER_IMAGE := $(DOCKER_REGISTRY)/parser-service:$(TAG)
-ADDITION_IMAGE := $(DOCKER_REGISTRY)/addition-service:$(TAG)
-SUBTRACTION_IMAGE := $(DOCKER_REGISTRY)/subtraction-service:$(TAG)
-MULTIPLICATION_IMAGE := $(DOCKER_REGISTRY)/multiplication-service:$(TAG)
-DIVISION_IMAGE := $(DOCKER_REGISTRY)/division-service:$(TAG)
+GATEWAY_IMAGE := $(DOCKER_REGISTRY)/calculator-gateway:$(TAG)
+PARSER_IMAGE := $(DOCKER_REGISTRY)/calculator-parser:$(TAG)
+ADDITION_IMAGE := $(DOCKER_REGISTRY)/calculator-addition:$(TAG)
+SUBTRACTION_IMAGE := $(DOCKER_REGISTRY)/calculator-subtraction:$(TAG)
+MULTIPLICATION_IMAGE := $(DOCKER_REGISTRY)/calculator-multiplication:$(TAG)
+DIVISION_IMAGE := $(DOCKER_REGISTRY)/calculator-division:$(TAG)
 
 .PHONY: docker-all docker-gateway docker-parser docker-addition docker-subtraction docker-multiplication docker-division
 
