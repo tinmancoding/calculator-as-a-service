@@ -1,3 +1,6 @@
 __pycache__/
 node_modules/
 dist/
+
+# Go binaries
+services/multiplication-service/multiplication-service
