@@ -92,12 +92,14 @@ DIVISION_SERVICE_URL=http://division-service:8086
 ### 1.2 Parser Service
 **Responsibility:** Convert string expressions to JSON Abstract Syntax Tree
 
-**Technology:** Python (using pyparsing or custom parser)
+**Technology:** Python (Flask with custom recursive descent parser)
 
 **Endpoints:**
 - `POST /parse`
   - Request: `{"expression": "2 + 3 * 4"}`
   - Response: `{"ast": {...}, "eventLog": [...]}`
+- `GET /health` - Liveness probe
+- `GET /ready` - Readiness probe
 
 **AST Structure:**
 ```json
@@ -126,8 +128,25 @@ DIVISION_SERVICE_URL=http://division-service:8086
 **Features:**
 - Operator precedence (*, / before +, -)
 - Parentheses support
-- Decimal numbers support
+- Decimal numbers support (using pattern: `\d+\.\d+|\d+`)
 - Error handling for invalid expressions
+- Input validation (max expression length: 1000 characters)
+- Security: Internal errors logged server-side, generic errors returned to clients
+
+**Environment Variables:**
+```bash
+SERVICE_NAME=parser-service
+PORT=8081
+MAX_EXPRESSION_LENGTH=1000  # Maximum expression length to prevent abuse
+```
+
+**Grammar:**
+```
+expression  : term (('+' | '-') term)*
+term        : factor (('*' | '/') factor)*
+factor      : NUMBER | '(' expression ')'
+NUMBER      : \d+\.\d+ | \d+  # Decimal or integer
+```
 
 ---
 
@@ -551,6 +570,7 @@ spec:
       containers:
       - name: addition
         image: calculator/addition-service:latest
+        imagePullPolicy: Always  # Use Always with :latest tag for consistency
         ports:
         - containerPort: 8082
         env:
@@ -1035,6 +1055,20 @@ Introduce random pod failures and observe recovery
 ### 12.4 Resource Exhaustion
 **Problem:** Too many service replicas consuming resources
 **Solution:** Set proper resource limits and HPA thresholds
+
+### 12.5 Security Vulnerabilities
+**Problem:** Input validation missing, internal errors exposed to clients
+**Solution:**
+- Implement input validation (e.g., MAX_EXPRESSION_LENGTH for parser)
+- Log detailed errors server-side for debugging
+- Return generic error messages to clients to avoid information leakage
+- Use proper error boundaries in all services
+
+### 12.6 Image Deployment Inconsistencies
+**Problem:** Using `:latest` tag with `imagePullPolicy: IfNotPresent` causes inconsistent deployments
+**Solution:**
+- Use `imagePullPolicy: Always` with `:latest` tags
+- Or use specific version tags (e.g., `v1.2.3`) with `IfNotPresent`
 
 ---
 
