@@ -40,6 +40,11 @@ spec:
             configMapKeyRef:
               name: calculator-config
               key: division_service_url
+        - name: MULTIPLICATION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: multiplication_service_url
         resources:
           requests:
             memory: "64Mi"

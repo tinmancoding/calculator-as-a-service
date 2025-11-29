@@ -84,6 +84,7 @@ Readiness probe endpoint.
 | `ADDITION_SERVICE_URL` | URL of addition service | `http://addition-service:8082` |
 | `SUBTRACTION_SERVICE_URL` | URL of subtraction service | `http://subtraction-service:8083` |
 | `DIVISION_SERVICE_URL` | URL of division service | `http://division-service:8086` |
+| `MULTIPLICATION_SERVICE_URL` | URL of multiplication service | `http://multiplication-service:8084` |
 
 ## Running Locally
 
