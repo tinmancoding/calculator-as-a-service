@@ -20,8 +20,14 @@ import java.util.Map;
 @RestController
 public class DivisionController {
 
+    private static final double ZERO_TOLERANCE = 1e-10;
+    
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public DivisionController(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @Value("${SERVICE_NAME:division-service}")
     private String serviceName;
@@ -175,8 +181,8 @@ public class DivisionController {
             EvaluationResult leftEval = evaluateOperand(leftOperand);
             EvaluationResult rightEval = evaluateOperand(rightOperand);
 
-            // Check for division by zero
-            if (rightEval.value == 0) {
+            // Check for division by zero (using tolerance for floating-point comparison)
+            if (Math.abs(rightEval.value) < ZERO_TOLERANCE) {
                 ObjectNode error = objectMapper.createObjectNode();
                 error.put("error", "Division by zero");
                 return ResponseEntity.badRequest().body(error);
