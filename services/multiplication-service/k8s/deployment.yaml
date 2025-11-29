@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multiplication-service
+  labels:
+    app: calculator
+    service: multiplication
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: calculator
+      service: multiplication
+  template:
+    metadata:
+      labels:
+        app: calculator
+        service: multiplication
+    spec:
+      containers:
+      - name: multiplication
+        image: calculator/multiplication-service:latest
+        ports:
+        - containerPort: 8084
+        env:
+        - name: SERVICE_NAME
+          value: "multiplication-service"
+        - name: ADDITION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: addition_service_url
+        - name: SUBTRACTION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: subtraction_service_url
+        - name: DIVISION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: division_service_url
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8084
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8084
+          initialDelaySeconds: 5
+          periodSeconds: 5

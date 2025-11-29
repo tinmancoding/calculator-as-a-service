@@ -1,1 +1,4 @@
 __pycache__/
+
+# Go binaries
+services/multiplication-service/multiplication-service
