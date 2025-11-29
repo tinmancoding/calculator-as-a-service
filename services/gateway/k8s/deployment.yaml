@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: gateway
-        image: calculator/gateway-service:latest
+        image: tinmancoding/calculator-gateway:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
