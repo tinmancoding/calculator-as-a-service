@@ -342,6 +342,7 @@ curl -X POST http://localhost:8081/parse \
 | `SERVICE_NAME` | `parser-service` | Name of the service for logging |
 | `PORT` | `8081` | Port the service listens on |
 | `HOSTNAME` | System hostname | Pod name in Kubernetes |
+| `MAX_EXPRESSION_LENGTH` | `1000` | Maximum allowed length of the input expression |
 
 ## Error Handling
 
