@@ -36,7 +36,8 @@ class ExpressionParser:
         expression = re.sub(r'\s+', '', expression)
 
         # Pattern for numbers (including decimals) and operators
-        pattern = r'(\d+\.?\d*|[+\-*/()])'
+        # Matches decimal numbers (\d+\.\d+) or integers (\d+) explicitly
+        pattern = r'(\d+\.\d+|\d+|[+\-*/()])'
         tokens = re.findall(pattern, expression)
 
         # Validate that we captured the entire expression

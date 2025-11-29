@@ -5,7 +5,8 @@ Provides /parse endpoint for converting arithmetic expressions to AST
 
 import os
 import socket
-from datetime import datetime
+import logging
+from datetime import datetime, timezone
 from time import time
 from flask import Flask, request, jsonify
 from parser import parse_expression, ParserError
@@ -15,6 +16,10 @@ app = Flask(__name__)
 # Configuration
 SERVICE_NAME = os.getenv('SERVICE_NAME', 'parser-service')
 PORT = int(os.getenv('PORT', '8081'))
+MAX_EXPRESSION_LENGTH = int(os.getenv('MAX_EXPRESSION_LENGTH', '1000'))
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 
 def get_hostname():
@@ -24,10 +29,10 @@ def get_hostname():
 
 def get_iso_timestamp():
     """Get current timestamp in ISO 8601 format"""
-    return datetime.utcnow().isoformat() + 'Z'
+    return datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
 
-def create_event_log(operation: str, input_expr: str, result: str, duration: int):
+def create_event_log(operation: str, input_expr: str, result: str, duration_ms: int):
     """
     Create an event log entry
 
@@ -35,7 +40,7 @@ def create_event_log(operation: str, input_expr: str, result: str, duration: int
         operation: Type of operation performed
         input_expr: Input expression
         result: Result description
-        duration: Duration in milliseconds
+        duration_ms: Duration in milliseconds
 
     Returns:
         Dictionary representing the event log entry
@@ -47,7 +52,7 @@ def create_event_log(operation: str, input_expr: str, result: str, duration: int
         "operation": operation,
         "input": input_expr,
         "result": result,
-        "duration": duration
+        "duration": duration_ms
     }
 
 
@@ -94,6 +99,8 @@ def parse():
         }
     """
     start_time = time()
+    data = None
+    expression = 'unknown'
 
     try:
         # Validate request
@@ -121,16 +128,22 @@ def parse():
                 "error": "'expression' must be a string"
             }), 400
 
+        # Validate expression length to prevent abuse
+        if len(expression) > MAX_EXPRESSION_LENGTH:
+            return jsonify({
+                "error": f"Expression exceeds maximum length of {MAX_EXPRESSION_LENGTH} characters"
+            }), 400
+
         # Parse the expression
         try:
             ast = parse_expression(expression)
         except ParserError as e:
-            duration = int((time() - start_time) * 1000)
+            duration_ms = int((time() - start_time) * 1000)
             event_log = create_event_log(
                 operation="parse",
                 input_expr=expression,
                 result=f"Parse error: {str(e)}",
-                duration=duration
+                duration_ms=duration_ms
             )
 
             return jsonify({
@@ -139,14 +152,14 @@ def parse():
             }), 400
 
         # Calculate duration
-        duration = int((time() - start_time) * 1000)
+        duration_ms = int((time() - start_time) * 1000)
 
         # Create event log
         event_log = create_event_log(
             operation="parse",
             input_expr=expression,
             result="AST generated",
-            duration=duration
+            duration_ms=duration_ms
         )
 
         # Return successful response
@@ -156,17 +169,20 @@ def parse():
         }), 200
 
     except Exception as e:
-        # Handle unexpected errors
-        duration = int((time() - start_time) * 1000)
+        # Log the full error internally for debugging
+        logging.error(f"Internal error in /parse: {str(e)}", exc_info=True)
+
+        # Handle unexpected errors - don't leak internal details
+        duration_ms = int((time() - start_time) * 1000)
         event_log = create_event_log(
             operation="parse",
-            input_expr=data.get('expression', 'unknown') if 'data' in locals() else 'unknown',
-            result=f"Internal error: {str(e)}",
-            duration=duration
+            input_expr=expression if expression != 'unknown' else 'unknown',
+            result="Internal error occurred",
+            duration_ms=duration_ms
         )
 
         return jsonify({
-            "error": f"Internal server error: {str(e)}",
+            "error": "Internal server error occurred",
             "eventLog": [event_log]
         }), 500
 

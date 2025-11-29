@@ -169,13 +169,76 @@ This grammar ensures correct operator precedence:
 
 ## Example Expressions
 
-| Expression | Result AST |
-|-----------|-----------|
-| `5 + 3` | Simple addition |
-| `10 + 5 * 2` | Multiplication evaluated first: `10 + (5 * 2)` |
-| `(3 + 5) * 2` | Parentheses override precedence |
-| `10.5 + 2.3` | Decimal number support |
-| `((1 + 2) * 3) / 4` | Nested parentheses |
+### Simple Addition: `5 + 3`
+```json
+{
+  "type": "operation",
+  "operator": "+",
+  "left": {"type": "number", "value": 5},
+  "right": {"type": "number", "value": 3}
+}
+```
+
+### Operator Precedence: `10 + 5 * 2`
+Multiplication evaluated first: `10 + (5 * 2)`
+```json
+{
+  "type": "operation",
+  "operator": "+",
+  "left": {"type": "number", "value": 10},
+  "right": {
+    "type": "operation",
+    "operator": "*",
+    "left": {"type": "number", "value": 5},
+    "right": {"type": "number", "value": 2}
+  }
+}
+```
+
+### Parentheses Override: `(3 + 5) * 2`
+```json
+{
+  "type": "operation",
+  "operator": "*",
+  "left": {
+    "type": "operation",
+    "operator": "+",
+    "left": {"type": "number", "value": 3},
+    "right": {"type": "number", "value": 5}
+  },
+  "right": {"type": "number", "value": 2}
+}
+```
+
+### Decimal Numbers: `10.5 + 2.3`
+```json
+{
+  "type": "operation",
+  "operator": "+",
+  "left": {"type": "number", "value": 10.5},
+  "right": {"type": "number", "value": 2.3}
+}
+```
+
+### Nested Parentheses: `((1 + 2) * 3) / 4`
+```json
+{
+  "type": "operation",
+  "operator": "/",
+  "left": {
+    "type": "operation",
+    "operator": "*",
+    "left": {
+      "type": "operation",
+      "operator": "+",
+      "left": {"type": "number", "value": 1},
+      "right": {"type": "number", "value": 2}
+    },
+    "right": {"type": "number", "value": 3}
+  },
+  "right": {"type": "number", "value": 4}
+}
+```
 
 ## Local Development
 

@@ -20,7 +20,7 @@ spec:
       containers:
       - name: parser
         image: calculator/parser-service:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 8081
           name: http
