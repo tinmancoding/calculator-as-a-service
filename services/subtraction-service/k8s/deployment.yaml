@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subtraction-service
+  labels:
+    app: calculator
+    service: subtraction
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: calculator
+      service: subtraction
+  template:
+    metadata:
+      labels:
+        app: calculator
+        service: subtraction
+    spec:
+      containers:
+      - name: subtraction
+        image: calculator/subtraction-service:latest
+        ports:
+        - containerPort: 8083
+        env:
+        - name: SERVICE_NAME
+          value: "subtraction-service"
+        - name: ADDITION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: addition_service_url
+        - name: MULTIPLICATION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: multiplication_service_url
+        - name: DIVISION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: division_service_url
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8083
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8083
+          initialDelaySeconds: 5
+          periodSeconds: 5
