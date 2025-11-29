@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: division-service
+  labels:
+    app: calculator
+    service: division
+spec:
+  selector:
+    app: calculator
+    service: division
+  ports:
+  - port: 8086
+    targetPort: 8086
+  type: ClusterIP
