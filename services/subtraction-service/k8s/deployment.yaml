@@ -30,6 +30,11 @@ spec:
             configMapKeyRef:
               name: calculator-config
               key: addition_service_url
+        - name: SUBTRACTION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: calculator-config
+              key: subtraction_service_url
         - name: MULTIPLICATION_SERVICE_URL
           valueFrom:
             configMapKeyRef:
