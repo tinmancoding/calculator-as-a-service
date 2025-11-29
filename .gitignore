@@ -1,1 +1,20 @@
 __pycache__/
+
+# Java/Maven build artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# Maven wrapper downloaded files
+.mvn/wrapper/maven-wrapper.jar
