@@ -1,0 +1,224 @@
+{{- if .Values.openshift.build.enabled }}
+---
+# Gateway ImageStream
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.gateway.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "gateway") | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: true
+---
+# Gateway BuildConfig
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.gateway.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "gateway") | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.gateway.image.repository }}:{{ .Values.gateway.image.tag }}
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.openshift.build.sourceRepo }}
+      ref: {{ .Values.openshift.build.sourceRef }}
+    contextDir: {{ .Values.gateway.contextPath }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+---
+# Parser ImageStream
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.parser.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "parser") | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: true
+---
+# Parser BuildConfig
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.parser.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "parser") | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.parser.image.repository }}:{{ .Values.parser.image.tag }}
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.openshift.build.sourceRepo }}
+      ref: {{ .Values.openshift.build.sourceRef }}
+    contextDir: {{ .Values.parser.contextPath }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+---
+# Addition ImageStream
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.addition.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "addition") | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: true
+---
+# Addition BuildConfig
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.addition.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "addition") | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.addition.image.repository }}:{{ .Values.addition.image.tag }}
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.openshift.build.sourceRepo }}
+      ref: {{ .Values.openshift.build.sourceRef }}
+    contextDir: {{ .Values.addition.contextPath }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+---
+# Subtraction ImageStream
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.subtraction.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "subtraction") | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: true
+---
+# Subtraction BuildConfig
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.subtraction.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "subtraction") | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.subtraction.image.repository }}:{{ .Values.subtraction.image.tag }}
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.openshift.build.sourceRepo }}
+      ref: {{ .Values.openshift.build.sourceRef }}
+    contextDir: {{ .Values.subtraction.contextPath }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+---
+# Multiplication ImageStream
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.multiplication.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "multiplication") | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: true
+---
+# Multiplication BuildConfig
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.multiplication.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "multiplication") | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.multiplication.image.repository }}:{{ .Values.multiplication.image.tag }}
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.openshift.build.sourceRepo }}
+      ref: {{ .Values.openshift.build.sourceRef }}
+    contextDir: {{ .Values.multiplication.contextPath }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+---
+# Division ImageStream
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ .Values.division.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "division") | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: true
+---
+# Division BuildConfig
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: {{ .Values.division.image.repository }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "division") | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: {{ .Values.division.image.repository }}:{{ .Values.division.image.tag }}
+  source:
+    type: Git
+    git:
+      uri: {{ .Values.openshift.build.sourceRepo }}
+      ref: {{ .Values.openshift.build.sourceRef }}
+    contextDir: {{ .Values.division.contextPath }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+{{- end }}

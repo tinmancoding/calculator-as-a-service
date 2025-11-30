@@ -1,0 +1,15 @@
+apiVersion: v2
+name: calculator
+description: A Helm chart for Calculator as a Service - distributed microservices calculator
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - calculator
+  - microservices
+  - distributed-system
+maintainers:
+  - name: tinmancoding
+home: https://github.com/tinmancoding/calculator-as-a-service
+sources:
+  - https://github.com/tinmancoding/calculator-as-a-service

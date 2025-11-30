@@ -1,0 +1,57 @@
+{{- if .Values.multiplication.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.multiplication.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "multiplication") | nindent 4 }}
+  {{- if .Values.openshift.build.enabled }}
+  annotations:
+    {{- include "calculator.deploymentAnnotations" (dict "context" . "service" .Values.multiplication "containerName" "multiplication") | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.multiplication.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "multiplication") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "multiplication") | nindent 8 }}
+    spec:
+      containers:
+      - name: multiplication
+        image: {{ include "calculator.image" (dict "context" . "service" .Values.multiplication) }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.multiplication.service.targetPort }}
+        env:
+        - name: SERVICE_NAME
+          value: {{ .Values.multiplication.name | quote }}
+        - name: ADDITION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: addition_service_url
+        - name: SUBTRACTION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: subtraction_service_url
+        - name: DIVISION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: division_service_url
+        - name: PARSER_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: parser_service_url
+        resources:
+          {{- toYaml .Values.multiplication.resources | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.multiplication.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.multiplication.readinessProbe | nindent 10 }}
+{{- end }}

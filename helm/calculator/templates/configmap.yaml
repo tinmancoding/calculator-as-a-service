@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "calculator.fullname" . }}-config
+  labels:
+    {{- include "calculator.labels" . | nindent 4 }}
+data:
+  parser_service_url: {{ .Values.config.parserServiceUrl | quote }}
+  addition_service_url: {{ .Values.config.additionServiceUrl | quote }}
+  subtraction_service_url: {{ .Values.config.subtractionServiceUrl | quote }}
+  multiplication_service_url: {{ .Values.config.multiplicationServiceUrl | quote }}
+  division_service_url: {{ .Values.config.divisionServiceUrl | quote }}

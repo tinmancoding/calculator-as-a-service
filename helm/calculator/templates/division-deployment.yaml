@@ -1,0 +1,52 @@
+{{- if .Values.division.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.division.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "division") | nindent 4 }}
+  {{- if .Values.openshift.build.enabled }}
+  annotations:
+    {{- include "calculator.deploymentAnnotations" (dict "context" . "service" .Values.division "containerName" "division") | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.division.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "division") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "division") | nindent 8 }}
+    spec:
+      containers:
+      - name: division
+        image: {{ include "calculator.image" (dict "context" . "service" .Values.division) }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.division.service.targetPort }}
+        env:
+        - name: SERVICE_NAME
+          value: {{ .Values.division.name | quote }}
+        - name: ADDITION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: addition_service_url
+        - name: SUBTRACTION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: subtraction_service_url
+        - name: MULTIPLICATION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: multiplication_service_url
+        resources:
+          {{- toYaml .Values.division.resources | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.division.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.division.readinessProbe | nindent 10 }}
+{{- end }}

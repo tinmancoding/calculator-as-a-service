@@ -1,0 +1,57 @@
+{{- if .Values.subtraction.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.subtraction.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "subtraction") | nindent 4 }}
+  {{- if .Values.openshift.build.enabled }}
+  annotations:
+    {{- include "calculator.deploymentAnnotations" (dict "context" . "service" .Values.subtraction "containerName" "subtraction") | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.subtraction.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "subtraction") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "subtraction") | nindent 8 }}
+    spec:
+      containers:
+      - name: subtraction
+        image: {{ include "calculator.image" (dict "context" . "service" .Values.subtraction) }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.subtraction.service.targetPort }}
+        env:
+        - name: SERVICE_NAME
+          value: {{ .Values.subtraction.name | quote }}
+        - name: ADDITION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: addition_service_url
+        - name: MULTIPLICATION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: multiplication_service_url
+        - name: DIVISION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: division_service_url
+        - name: PARSER_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: parser_service_url
+        resources:
+          {{- toYaml .Values.subtraction.resources | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.subtraction.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.subtraction.readinessProbe | nindent 10 }}
+{{- end }}

@@ -1,0 +1,105 @@
+# Example values for production environment
+# Usage: helm install calculator ./helm/calculator -f helm/calculator/examples/production-values.yaml
+
+# Increase replica counts for high availability
+gateway:
+  replicaCount: 3
+  
+parser:
+  replicaCount: 3
+  
+addition:
+  replicaCount: 3
+  
+subtraction:
+  replicaCount: 3
+  
+multiplication:
+  replicaCount: 3
+  
+division:
+  replicaCount: 3
+
+# Use specific image tags instead of 'latest'
+gateway:
+  image:
+    tag: "v1.0.0"
+    
+parser:
+  image:
+    tag: "v1.0.0"
+    
+addition:
+  image:
+    tag: "v1.0.0"
+    
+subtraction:
+  image:
+    tag: "v1.0.0"
+    
+multiplication:
+  image:
+    tag: "v1.0.0"
+    
+division:
+  image:
+    tag: "v1.0.0"
+
+# Use IfNotPresent for stable tags in production
+global:
+  imagePullPolicy: IfNotPresent
+
+# Increase resource allocations for production workload
+gateway:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+parser:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+addition:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+subtraction:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+multiplication:
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+division:
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "500m"
+    limits:
+      memory: "512Mi"
+      cpu: "1000m"

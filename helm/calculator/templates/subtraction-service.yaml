@@ -1,0 +1,15 @@
+{{- if .Values.subtraction.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.subtraction.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "subtraction") | nindent 4 }}
+spec:
+  selector:
+    {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "subtraction") | nindent 4 }}
+  ports:
+  - port: {{ .Values.subtraction.service.port }}
+    targetPort: {{ .Values.subtraction.service.targetPort }}
+  type: {{ .Values.subtraction.service.type }}
+{{- end }}

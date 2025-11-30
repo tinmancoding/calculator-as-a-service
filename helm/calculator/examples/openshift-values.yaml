@@ -1,0 +1,16 @@
+# Example values for OpenShift deployment with source builds
+# Usage: helm install calculator ./helm/calculator -f helm/calculator/examples/openshift-values.yaml
+
+# Enable OpenShift builds
+openshift:
+  build:
+    enabled: true
+    sourceRepo: "https://github.com/tinmancoding/calculator-as-a-service.git"
+    sourceRef: "main"
+
+# Standard service configuration
+global:
+  imagePullPolicy: Always
+
+# All services use default configuration from values.yaml
+# The images will be built from source and stored in local ImageStreams

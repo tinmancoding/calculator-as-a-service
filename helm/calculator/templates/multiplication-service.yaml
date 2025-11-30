@@ -1,0 +1,15 @@
+{{- if .Values.multiplication.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.multiplication.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "multiplication") | nindent 4 }}
+spec:
+  selector:
+    {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "multiplication") | nindent 4 }}
+  ports:
+  - port: {{ .Values.multiplication.service.port }}
+    targetPort: {{ .Values.multiplication.service.targetPort }}
+  type: {{ .Values.multiplication.service.type }}
+{{- end }}

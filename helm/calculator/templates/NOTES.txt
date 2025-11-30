@@ -1,0 +1,77 @@
+Calculator as a Service has been installed!
+
+Release Name: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+Services deployed:
+{{- if .Values.gateway.enabled }}
+  ✓ Gateway Service ({{ .Values.gateway.name }}) on port {{ .Values.gateway.service.port }}
+{{- end }}
+{{- if .Values.parser.enabled }}
+  ✓ Parser Service ({{ .Values.parser.name }}) on port {{ .Values.parser.service.port }}
+{{- end }}
+{{- if .Values.addition.enabled }}
+  ✓ Addition Service ({{ .Values.addition.name }}) on port {{ .Values.addition.service.port }}
+{{- end }}
+{{- if .Values.subtraction.enabled }}
+  ✓ Subtraction Service ({{ .Values.subtraction.name }}) on port {{ .Values.subtraction.service.port }}
+{{- end }}
+{{- if .Values.multiplication.enabled }}
+  ✓ Multiplication Service ({{ .Values.multiplication.name }}) on port {{ .Values.multiplication.service.port }}
+{{- end }}
+{{- if .Values.division.enabled }}
+  ✓ Division Service ({{ .Values.division.name }}) on port {{ .Values.division.service.port }}
+{{- end }}
+
+{{- if .Values.openshift.build.enabled }}
+
+OpenShift Build Configuration:
+  ✓ ImageStreams and BuildConfigs created for all services
+  ✓ Source Repository: {{ .Values.openshift.build.sourceRepo }}
+  ✓ Source Branch: {{ .Values.openshift.build.sourceRef }}
+  
+To trigger builds manually:
+  oc start-build {{ .Values.gateway.image.repository }}
+  oc start-build {{ .Values.parser.image.repository }}
+  oc start-build {{ .Values.addition.image.repository }}
+  oc start-build {{ .Values.subtraction.image.repository }}
+  oc start-build {{ .Values.multiplication.image.repository }}
+  oc start-build {{ .Values.division.image.repository }}
+
+To monitor build progress:
+  oc get builds -w
+{{- end }}
+
+To check the status of your deployment:
+  kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/instance={{ .Release.Name }}
+
+To access the gateway service:
+{{- if eq .Values.gateway.service.type "ClusterIP" }}
+  # Port-forward the gateway service:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ .Values.gateway.name }} {{ .Values.gateway.service.port }}:{{ .Values.gateway.service.port }}
+  
+  # Then access it at:
+  http://localhost:{{ .Values.gateway.service.port }}
+{{- else if eq .Values.gateway.service.type "NodePort" }}
+  # Get the NodePort:
+  export NODE_PORT=$(kubectl get -n {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ .Values.gateway.name }})
+  export NODE_IP=$(kubectl get nodes -o jsonpath="{.items[0].status.addresses[0].address}")
+  
+  # Access at:
+  http://$NODE_IP:$NODE_PORT
+{{- else if eq .Values.gateway.service.type "LoadBalancer" }}
+  # Get the LoadBalancer IP:
+  export SERVICE_IP=$(kubectl get svc -n {{ .Release.Namespace }} {{ .Values.gateway.name }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  
+  # Access at:
+  http://$SERVICE_IP:{{ .Values.gateway.service.port }}
+{{- end }}
+
+Example request:
+  curl -X POST http://localhost:{{ .Values.gateway.service.port }}/calculate \
+    -H "Content-Type: application/json" \
+    -d '{"expression": "5 + 3 * 2"}'
+
+For more information:
+  helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
+  helm get values {{ .Release.Name }} -n {{ .Release.Namespace }}

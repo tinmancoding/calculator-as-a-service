@@ -1,0 +1,62 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.gateway.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "gateway") | nindent 4 }}
+  {{- if .Values.openshift.build.enabled }}
+  annotations:
+    {{- include "calculator.deploymentAnnotations" (dict "context" . "service" .Values.gateway "containerName" "gateway") | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.gateway.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "gateway") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "gateway") | nindent 8 }}
+    spec:
+      containers:
+      - name: gateway
+        image: {{ include "calculator.image" (dict "context" . "service" .Values.gateway) }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.gateway.service.targetPort }}
+        env:
+        - name: SERVICE_NAME
+          value: {{ .Values.gateway.name | quote }}
+        - name: PARSER_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: parser_service_url
+        - name: ADDITION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: addition_service_url
+        - name: SUBTRACTION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: subtraction_service_url
+        - name: MULTIPLICATION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: multiplication_service_url
+        - name: DIVISION_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "calculator.fullname" . }}-config
+              key: division_service_url
+        resources:
+          {{- toYaml .Values.gateway.resources | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.gateway.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.gateway.readinessProbe | nindent 10 }}
+{{- end }}

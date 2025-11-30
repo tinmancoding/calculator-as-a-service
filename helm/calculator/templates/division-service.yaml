@@ -1,0 +1,15 @@
+{{- if .Values.division.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.division.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "division") | nindent 4 }}
+spec:
+  selector:
+    {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "division") | nindent 4 }}
+  ports:
+  - port: {{ .Values.division.service.port }}
+    targetPort: {{ .Values.division.service.targetPort }}
+  type: {{ .Values.division.service.type }}
+{{- end }}

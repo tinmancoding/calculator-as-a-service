@@ -1,0 +1,15 @@
+{{- if .Values.addition.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.addition.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "addition") | nindent 4 }}
+spec:
+  selector:
+    {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "addition") | nindent 4 }}
+  ports:
+  - port: {{ .Values.addition.service.port }}
+    targetPort: {{ .Values.addition.service.targetPort }}
+  type: {{ .Values.addition.service.type }}
+{{- end }}

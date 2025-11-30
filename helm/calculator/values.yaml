@@ -1,0 +1,226 @@
+# Default values for calculator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Global settings
+global:
+  imagePullPolicy: Always
+  imageRegistry: tinmancoding
+
+# OpenShift specific settings
+openshift:
+  # Enable OpenShift BuildConfig and ImageStream resources
+  build:
+    enabled: false
+    sourceRepo: "https://github.com/tinmancoding/calculator-as-a-service.git"
+    sourceRef: "main"
+
+# Gateway Service
+gateway:
+  enabled: true
+  name: gateway-service
+  replicaCount: 2
+  image:
+    repository: calculator-gateway
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 8080
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  contextPath: services/gateway
+
+# Parser Service
+parser:
+  enabled: true
+  name: parser-service
+  replicaCount: 2
+  image:
+    repository: calculator-parser
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8081
+    targetPort: 8081
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8081
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 8081
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+  contextPath: services/parser
+
+# Addition Service
+addition:
+  enabled: true
+  name: addition-service
+  replicaCount: 2
+  image:
+    repository: calculator-addition
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8082
+    targetPort: 8082
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8082
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 8082
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  contextPath: services/addition-service
+
+# Subtraction Service
+subtraction:
+  enabled: true
+  name: subtraction-service
+  replicaCount: 2
+  image:
+    repository: calculator-subtraction
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8083
+    targetPort: 8083
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8083
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 8083
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  contextPath: services/subtraction-service
+
+# Multiplication Service
+multiplication:
+  enabled: true
+  name: multiplication-service
+  replicaCount: 2
+  image:
+    repository: calculator-multiplication
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8084
+    targetPort: 8084
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8084
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 8084
+    initialDelaySeconds: 5
+    periodSeconds: 5
+  contextPath: services/multiplication-service
+
+# Division Service
+division:
+  enabled: true
+  name: division-service
+  replicaCount: 2
+  image:
+    repository: calculator-division
+    tag: latest
+  service:
+    type: ClusterIP
+    port: 8086
+    targetPort: 8086
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "200m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+  livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8086
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8086
+    initialDelaySeconds: 20
+    periodSeconds: 5
+  contextPath: services/division-service
+
+# ConfigMap for service URLs
+config:
+  parserServiceUrl: "http://parser-service:8081"
+  additionServiceUrl: "http://addition-service:8082"
+  subtractionServiceUrl: "http://subtraction-service:8083"
+  multiplicationServiceUrl: "http://multiplication-service:8084"
+  divisionServiceUrl: "http://division-service:8086"

@@ -1,0 +1,76 @@
+# Example values for development environment
+# Usage: helm install calculator ./helm/calculator -f helm/calculator/examples/dev-values.yaml
+
+# Reduce replica counts for development
+gateway:
+  replicaCount: 1
+  
+parser:
+  replicaCount: 1
+  
+addition:
+  replicaCount: 1
+  
+subtraction:
+  replicaCount: 1
+  
+multiplication:
+  replicaCount: 1
+  
+division:
+  replicaCount: 1
+
+# Reduce resource requests for local development
+gateway:
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "50m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+
+parser:
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "50m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+
+addition:
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "50m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+
+subtraction:
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "50m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+
+multiplication:
+  resources:
+    requests:
+      memory: "32Mi"
+      cpu: "50m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
+
+division:
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
+      cpu: "200m"

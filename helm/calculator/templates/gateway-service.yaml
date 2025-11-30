@@ -1,0 +1,15 @@
+{{- if .Values.gateway.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.gateway.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "gateway") | nindent 4 }}
+spec:
+  selector:
+    {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "gateway") | nindent 4 }}
+  ports:
+  - port: {{ .Values.gateway.service.port }}
+    targetPort: {{ .Values.gateway.service.targetPort }}
+  type: {{ .Values.gateway.service.type }}
+{{- end }}

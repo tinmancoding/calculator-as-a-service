@@ -1,0 +1,41 @@
+{{- if .Values.parser.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.parser.name }}
+  labels:
+    {{- include "calculator.serviceLabels" (dict "context" . "serviceName" "parser") | nindent 4 }}
+  {{- if .Values.openshift.build.enabled }}
+  annotations:
+    {{- include "calculator.deploymentAnnotations" (dict "context" . "service" .Values.parser "containerName" "parser") | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.parser.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "parser") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "calculator.serviceSelectorLabels" (dict "serviceName" "parser") | nindent 8 }}
+    spec:
+      containers:
+      - name: parser
+        image: {{ include "calculator.image" (dict "context" . "service" .Values.parser) }}
+        imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.parser.service.targetPort }}
+          name: http
+          protocol: TCP
+        env:
+        - name: SERVICE_NAME
+          value: {{ .Values.parser.name | quote }}
+        - name: PORT
+          value: {{ .Values.parser.service.targetPort | quote }}
+        resources:
+          {{- toYaml .Values.parser.resources | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.parser.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.parser.readinessProbe | nindent 10 }}
+{{- end }}
