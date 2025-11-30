@@ -1,0 +1,157 @@
+version: '3.8'
+
+services:
+  # Parser Service (Python/Flask) - Port 8081
+  parser-service:
+    platform: linux/amd64
+    build:
+      context: ./services/parser
+      dockerfile: Dockerfile
+    container_name: parser-service
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVICE_NAME=parser-service
+      - PORT=8081
+    networks:
+      - calculator-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Addition Service (Python/Flask) - Port 8082
+  addition-service:
+    platform: linux/amd64
+    build:
+      context: ./services/addition-service
+      dockerfile: Dockerfile
+    container_name: addition-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVICE_NAME=addition-service
+      - PORT=8082
+      - ADDITION_SERVICE_URL=http://addition-service:8082
+      - SUBTRACTION_SERVICE_URL=http://subtraction-service:8083
+      - MULTIPLICATION_SERVICE_URL=http://multiplication-service:8084
+      - DIVISION_SERVICE_URL=http://division-service:8086
+    networks:
+      - calculator-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+  # Subtraction Service (TypeScript/Node.js) - Port 8083
+  subtraction-service:
+    platform: linux/amd64
+    build:
+      context: ./services/subtraction-service
+      dockerfile: Dockerfile
+    container_name: subtraction-service
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVICE_NAME=subtraction-service
+      - PORT=8083
+      - ADDITION_SERVICE_URL=http://addition-service:8082
+      - SUBTRACTION_SERVICE_URL=http://subtraction-service:8083
+      - MULTIPLICATION_SERVICE_URL=http://multiplication-service:8084
+      - DIVISION_SERVICE_URL=http://division-service:8086
+    networks:
+      - calculator-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+  # Multiplication Service (Go) - Port 8084
+  multiplication-service:
+    platform: linux/amd64
+    build:
+      context: ./services/multiplication-service
+      dockerfile: Dockerfile
+    container_name: multiplication-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SERVICE_NAME=multiplication-service
+      - PORT=8084
+      - ADDITION_SERVICE_URL=http://addition-service:8082
+      - SUBTRACTION_SERVICE_URL=http://subtraction-service:8083
+      - MULTIPLICATION_SERVICE_URL=http://multiplication-service:8084
+      - DIVISION_SERVICE_URL=http://division-service:8086
+    networks:
+      - calculator-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Division Service (Java/Spring Boot) - Port 8086
+  division-service:
+    platform: linux/amd64
+    build:
+      context: ./services/division-service
+      dockerfile: Dockerfile
+    container_name: division-service
+    ports:
+      - "8086:8086"
+    environment:
+      - SERVICE_NAME=division-service
+      - SERVER_PORT=8086
+      - ADDITION_SERVICE_URL=http://addition-service:8082
+      - SUBTRACTION_SERVICE_URL=http://subtraction-service:8083
+      - MULTIPLICATION_SERVICE_URL=http://multiplication-service:8084
+      - DIVISION_SERVICE_URL=http://division-service:8086
+    networks:
+      - calculator-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Gateway Service (Go) - Port 8080
+  gateway:
+    platform: linux/amd64
+    build:
+      context: ./services/gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVICE_NAME=gateway-service
+      - PORT=8080
+      - PARSER_SERVICE_URL=http://parser-service:8081
+      - ADDITION_SERVICE_URL=http://addition-service:8082
+      - SUBTRACTION_SERVICE_URL=http://subtraction-service:8083
+      - MULTIPLICATION_SERVICE_URL=http://multiplication-service:8084
+      - DIVISION_SERVICE_URL=http://division-service:8086
+    networks:
+      - calculator-network
+    depends_on:
+      - parser-service
+      - addition-service
+      - subtraction-service
+      - multiplication-service
+      - division-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  calculator-network:
+    driver: bridge
