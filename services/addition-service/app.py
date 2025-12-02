@@ -125,7 +125,7 @@ def execute():
         right_eval = evaluate_operand(right_operand)
         
         # Perform the addition
-        result = left_eval["value"] + right_eval["value"]
+        result = left_eval["value"] + right_eval["value"] + 1
         
         # Calculate duration
         duration = int((time.time() - start_time) * 1000)
